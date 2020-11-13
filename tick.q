@@ -108,94 +108,93 @@ ts:{
 
 if[system "t";
     
-	// Set timer functionality
-	.z.ts:{
-	    // Publish current table data to corresponding subscribers
-	    pub'[t;value each t];
-		// Purge table data and reset grouped attribute on sym columns
-	    @[`.;t;@[;`sym;`g#]0#];
-		// Update TP log msg count 
-		i::j;
-		// Check if EOD needs to be called
-		ts .z.D
-	};
+    // Set timer functionality
+    .z.ts:{
+        // Publish current table data to corresponding subscribers
+	pub'[t;value each t];
+	// Purge table data and reset grouped attribute on sym columns
+	@[`.;t;@[;`sym;`g#]0#];
+	// Update TP log msg count 
+	i::j;
+	// Check if EOD needs to be called
+	ts .z.D
+    };
 
     // .u.upd - function called by upstream feedhandler
-	// @Params
-	// t - table to update
-	// x - data to add to table
+    // @Params
+    // t - table to update
+    // x - data to add to table
     upd:{[t;x]
         
-		// Check if the data has a time column
-		if[not -16=type first first x;
-		    // 'a' is current timestamp
-			a:.z.P;
-			// Check if EOD needs to be run
-			if[d < "d"$a;
-			    .z.ts[]
-			];
-			// Cast 'a' to a timespan
-			a:"n"$a;
-			// Prepend the current timespan to each data element
-			x:$[0 > type first x;
-			    a,x;
-				(enlist(count first x)#a),x
-			]
-		];
+        // Check if the data has a time column
+	if[not -16=type first first x;
+	    // 'a' is current timestamp
+	    a:.z.P;
+	    // Check if EOD needs to be run
+	    if[d < "d"$a;
+	        .z.ts[]
+	    ];
+	    // Cast 'a' to a timespan
+	    a:"n"$a;
+	    // Prepend the current timespan to each data element
+	    x:$[0 > type first x;
+	         a, x;
+		 (enlist(count first x)#a), x
+	    ]
+	];
 		
         t insert x;
-		// If the TP file handle is open update the log and increment running count 
-		if[l;
-		    l enlist (`upd;t;x);
-			j+:1
-		];
-	}
- ];
-
+	// If the TP file handle is open update the log and increment running count 
+	if[l;
+	    l enlist (`upd;t;x);
+	    j+:1
+        ];
+    }
+];
 
 if[not system "t";
     
-	// If timer has not been set, set to one second
-	system "t 1000";
+    // If timer has not been set, set to one second
+    system "t 1000";
 
     // Set timer to check for EOD   
-	.z.ts:{ts .z.D};
+    .z.ts:{ts .z.D};
     
-	// .u.upd - function called by upstream feedhandler
-	// @Params
-	// t - table to update
-	// x - data to add to table
-	upd:{[t;x]
+    // .u.upd - function called by upstream feedhandler
+    // @Params
+    // t - table to update
+    // x - data to add to table
+    upd:{[t;x]
 	    
-		// 'a' is current timestamp
-	    a:.z.P;
+        // 'a' is current timestamp
+	a:.z.P;
 		
-		// Check if EOD needs to be run
-	    ts "d"$a;
+	// Check if EOD needs to be run
+	ts "d"$a;
 		
-	    // Check if the data has a time column
+	// Check if the data has a time column
         if[not -16=type first first x;
 		    
-			// Cast 'a' to a timespan
-	        a:"n"$a;
-			// Prepend the current timespan to each data element
-		    x:$[0>type first x;
-			    a,x;
-				(enlist(count first x)#a),x
-			]
-		];
+	    // Cast 'a' to a timespan
+	    a:"n"$a;
+	    // Prepend the current timespan to each data element
+	    x:$[0>type first x;
+	        a, x;
+		(enlist(count first x)#a),x
+	    ]
+	];
 		
-		// The table columns
+	// The table columns
         f:key flip value t;
-		// Add the table columns to the data and publish table
-		pub[t;$[0>type first x;enlist f!x;flip f!x]];
+	// Add the table columns to the data and publish table
+	pub[t;$[0>type first x;enlist f!x;flip f!x]];
 		
-		// If the TP file handle is open update the log and increment running count 
-		if[l;
-		    l enlist (`upd;t;x);
-			i+:1
-		];
-	}
+	// If the TP file handle is open update the log and increment running count 
+	if[l;
+	    l enlist (`upd;t;x);
+	    i+:1
+	];
+    }
  ];
 
 \d .
