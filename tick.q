@@ -42,16 +42,16 @@ ld:{
     // Check if TP log .u.L exists, create new one if not
     if[not type key L::`$(-10_string L), string x;
         .[L;();:;()]
-	];
-	// Read valid chunks of the log file
-	i::j::-11!(-2;L);
-	// If invalid entries found then log and exit
-	if[0<=type i;
-	    -2 (string L)," is a corrupt log. Truncate to length ", (string last i), " and restart";
-		exit 1
-	];
-	// Open log handle for writing
-	hopen L
+    ];
+    // Read valid chunks of the log file
+    i::j::-11!(-2;L);
+    // If invalid entries found then log and exit
+    if[0<=type i;
+        -2 (string L)," is a corrupt log. Truncate to length ", (string last i), " and restart";
+	exit 1
+    ];
+    // Open log handle for writing
+    hopen L
  };
 
 // .u.tick - initialises variables and log file and checks table validity
@@ -59,19 +59,19 @@ ld:{
 // x - the file name containing the table schemas (variable src) 
 // y - the log file directory
 tick:{
-	init[];
-	// Ensure each table has both a time and sym column
-	if[not min(`time`sym~2#key flip value@)each t;
-	    '`timesym
+    init[];
+    // Ensure each table has both a time and sym column
+    if[not min(`time`sym~2#key flip value@)each t;
+        '`timesym
     ];
-	// Apply the grouped attribute to the sym column of each table
-	@[;`sym;`g#] each t;
-	// Set .u.d to today's date
-	d::.z.D;
-	// If the log file directory is populated then initialise it 
-	if[l::count y;
-	    L::`$":", y, "/", x, 10#".";
-		l::ld d
+    // Apply the grouped attribute to the sym column of each table
+    @[;`sym;`g#] each t;
+    // Set .u.d to today's date
+    d::.z.D;
+    // If the log file directory is populated then initialise it 
+    if[l::count y;
+        L::`$":", y, "/", x, 10#".";
+	l::ld d
     ]
  };
 
@@ -81,12 +81,12 @@ tick:{
 endofday:{
     // Call .u.end for current date .u.d
     end d;
-	// Increment current date
-	d+:1;
-	// If the handle to the current log file is open then close it and initialise new log with new date
-	if[l;
-	    hclose l;
-		l::0(`.u.ld;d)
+    // Increment current date
+    d+:1;
+    // If the handle to the current log file is open then close it and initialise new log with new date
+    if[l;
+        hclose l;
+        l::0(`.u.ld;d)
     ]
  };
 
@@ -96,18 +96,17 @@ endofday:{
 ts:{
     // If new date is not greater than current date .u.d then exit
     if[d<x;
-	    // If new date is more than one day ahead of current day stop timer and throw an error
-	    if[d<x-1;
-		    system "t 0";
-			'"more than one day?"
-		];
-	    endofday[]
-	]
+        // If new date is more than one day ahead of current day stop timer and throw an error
+	if[d<x-1;
+	    system "t 0";
+            '"more than one day?"
+        ];
+	endofday[]
+    ]
  };
 
 
 if[system "t";
-    
     // Set timer functionality
     .z.ts:{
         // Publish current table data to corresponding subscribers
@@ -152,8 +151,8 @@ if[system "t";
     }
 ];
 
-if[not system "t";
-    
+
+if[not system "t";    
     // If timer has not been set, set to one second
     system "t 1000";
 
