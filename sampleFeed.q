@@ -34,8 +34,8 @@ getask:{[s] prices[s]+getmovement[s]};
     s:n?syms;
     // Generate 10% of updates for trade and 90% for quote
     $[0 < flag mod 10;
-    h(".u.upd";`quote;(n#.z.N;s;getbid'[s];getask'[s];n?1000;n?1000));
-    h(".u.upd";`trade;(n#.z.N;s;getprice'[s];n?1000))
+        h(".u.upd";`quote;(n#.z.N;s;getbid'[s];getask'[s];n?1000;n?1000));
+        h(".u.upd";`trade;(n#.z.N;s;getprice'[s];n?1000))
     ];
     flag+:1
  };
